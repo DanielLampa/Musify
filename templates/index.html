@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar: Now Playing -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🎵 Now Playing</h2>
+        </div>
+        
+        <div id="nowPlaying" class="now-playing">
+            <div class="album-art">
+                <span class="album-icon">🎵</span>
+            </div>
+            
+            <div id="currentSongInfo" class="song-info">
+                <h3 id="currentSongName">No song playing</h3>
+                <p id="currentSongMeta">Select songs from your library</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Audio Player -->
+            <div id="audioPlayerContainer" class="audio-player-container" style="display: none;">
+                <audio id="audioPlayer" controls></audio>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Playback Controls -->
+            <div class="playback-controls">
+                <button id="shuffleBtn" class="control-btn" title="Shuffle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+                    </svg>
+                </button>
+                <button id="prevBtn" class="control-btn" title="Previous">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 20L9 12l10-8v16zM5 19V5"/>
+                    </svg>
+                </button>
+                <button id="stopBtn" class="control-btn" title="Stop">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="6" y="6" width="12" height="12"/>
+                    </svg>
+                </button>
+                <button id="nextBtn" class="control-btn" title="Next">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 4l10 8-10 8V4zM19 5v14"/>
+                    </svg>
+                </button>
+                <button id="repeatBtn" class="control-btn" title="Repeat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 1l4 4-4 4"/>
+                        <path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4"/>
+                        <path d="M21 13v2a4 4 0 01-4 4H3"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Up Next -->
+            <div class="up-next">
+                <h4>📋 Up Next</h4>
+                <div id="upNextList" class="up-next-list">
+                    <p class="empty-text">No more songs in queue</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>🎵 Music Player</h1>
+            </div>
+            <div class="header-right">
+                <div class="stat-badge">
+                    <span id="totalSongsCount">0</span> Songs
+                </div>
+            </div>
+        </header>
+
+        <div class="divider"></div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="statTotalSongs">0</span>
+                <span class="stat-label">Total Songs</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="statInQueue">0</span>
+                <span class="stat-label">In Queue</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="statPlaying">0</span>
+                <span class="stat-label">Playing</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="statSelected">0</span>
+                <span class="stat-label">Selected</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="library">📚 Library</button>
+            <button class="tab-btn" data-tab="queue">📋 Queue</button>
+            <button class="tab-btn" data-tab="settings">⚙️ Settings</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Library Tab -->
+            <div id="libraryTab" class="tab-pane active">
+                <div class="action-bar">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search your library...">
+                    <button id="playAllBtn" class="btn btn-primary">▶️ Play All</button>
+                    <button id="shuffleAllBtn" class="btn btn-primary">🔀 Shuffle All</button>
+                    <button id="addSelectedBtn" class="btn btn-secondary" disabled>➕ Add Selected</button>
+                </div>
+
+                <div id="songsList" class="songs-list">
+                    <div class="loading">Loading songs...</div>
+                </div>
+            </div>
+
+            <!-- Queue Tab -->
+            <div id="queueTab" class="tab-pane">
+                <div class="queue-header">
+                    <h2>📋 Current Queue</h2>
+                    <div class="queue-actions">
+                        <button id="shuffleQueueBtn" class="btn btn-secondary">🔀 Shuffle Queue</button>
+                        <button id="clearQueueBtn" class="btn btn-danger">🗑️ Clear Queue</button>
+                    </div>
+                </div>
+
+                <div id="queueList" class="queue-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>Queue is empty</h3>
+                        <p>Add songs from your library to start listening</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-pane">
+                <div class="settings-section">
+                    <h2>📤 Upload Songs</h2>
+                    <div class="upload-area">
+                        <input type="file" id="fileInput" multiple accept=".mp3" style="display: none;">
+                        <button id="uploadBtn" class="btn btn-primary">Choose MP3 Files</button>
+                        <p class="upload-hint">Select one or more MP3 files to upload</p>
+                    </div>
+                    <div id="uploadStatus" class="upload-status"></div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="settings-section">
+                    <h2>🎵 Library Info</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Total Songs</span>
+                            <span class="info-value" id="infoTotalSongs">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Songs in Queue</span>
+                            <span class="info-value" id="infoQueueSize">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Repeat Mode</span>
+                            <span class="info-value" id="infoRepeatMode">OFF</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Currently Playing</span>
+                            <span class="info-value" id="infoIsPlaying">No</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="settings-section">
+                    <h2>ℹ️ About</h2>
+                    <div class="about-text">
+                        <p><strong>Music Player</strong> - shadcn/ui Style Edition</p>
+                        <ul>
+                            <li>▶️ Automatic next song playback</li>
+                            <li>📋 Always-visible sidebar</li>
+                            <li>🔀 Shuffle and repeat modes</li>
+                            <li>🎵 Multiple selection support</li>
+                            <li>🎨 Clean shadcn/ui inspired design</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
